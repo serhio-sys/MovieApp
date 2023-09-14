@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
+
+  web:
+    build: .
+    command: python /code/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    environment:
+      - DEBUG=1
+      - CLOUD_NAME=dr7mqzlf9
+      - CLOUD_API_KEY=931525198692321
+      - CLOUD_API_SECRET=AqcRuZrFthzijMTJrjugtl-dH3o
+
+  front:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    command: [ "http-server", "dist" ]
+    volumes:
+      - .:/front
+      - .:/front/node_modules
+    ports:
+      - 8080:8080
+
+volumes:
+  postgres_data:
